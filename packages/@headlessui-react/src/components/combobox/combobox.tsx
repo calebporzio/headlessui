@@ -694,6 +694,8 @@ let Input = forwardRefWithAs(function Input<
 
   let d = useDisposables()
 
+  let stableDisplayValue = useLatestValue(displayValue)
+
   // When a `displayValue` prop is given, we should use it to transform the current selected
   // option(s) so that the format can be chosen by developers implementing this.
   // This is useful if your data is an object and you just want to pick a certain property or want
@@ -704,16 +706,14 @@ let Input = forwardRefWithAs(function Input<
   // you don't have to use this at all, a more common UI is a "tag" based UI, which you can render
   // yourself using the selected option(s).
   let currentValue = useMemo(() => {
-    if (typeof displayValue === 'function') {
-      return displayValue(data.value as unknown as TType) ?? ''
+    if (typeof stableDisplayValue.current === 'function') {
+      return stableDisplayValue.current(data.value as unknown as TType) ?? ''
     } else if (typeof data.value === 'string') {
       return data.value
     } else {
       return ''
     }
-
-    // displayValue is intentionally left out
-  }, [data.value])
+  }, [data.value, displayValue])
 
   // Syncing the input value has some rules attached to it to guarantee a smooth and expected user
   // experience:
